@@ -139,7 +139,7 @@ print '============'
 print "Let's Start"
 print '============'
 
-generation_report = 'cart_pole_v4_v9.txt'
+generation_report = 'cart_pole_v4_v10.txt'
 
 env = gym.make("CartPole-v0")
 env.reset()
@@ -155,7 +155,7 @@ n_epoch = 5
 individuals_per_generation = 20
 individuals_to_percevere = 4
 mutation_rate = 0.3
-crossovers_per_generation = 11
+crossovers_per_generation = 8
 
 snapshot_step = None
 snapshot_epoch = False
