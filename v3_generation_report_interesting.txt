@@ -1,0 +1,7 @@
+Generation_0;[1761, 1753, 657]
+Generation_1;[2167, 2073, 1959]
+Generation_2;[2370, 1967, 1875]
+Generation_3;[1973, 1969, 1968]
+Generation_4;[2076, 1967, 1958]
+Generation_5;[1975, 1967, 1774]
+Generation_6;[1860, 1776, 1773]

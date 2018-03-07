@@ -86,7 +86,7 @@ while true do
 	end
 
 	outgoing:send(json.encode(data_to_send))
-	s, err = incomming:receive(4096)
+	s, err = incomming:receive(32768)
 	if s and not err then
 		controllers = reset_controllers(controllers)
 		data_received = json.decode(s)
@@ -135,7 +135,6 @@ while true do
 		data_to_send["ready_to_listen"] = true
 	end
 
-
 	emu.frameadvance()
 
 	p1_score = memory.readbyte(0x07E2)
@@ -145,64 +144,10 @@ while true do
 	p1_alive_status = memory.readbyte(0x0090)
 	horizontal_evolution = room + (room_increment*255)
 
-	features["p1_alive_status"] = p1_alive_status
-	features["horizontal_evolution"] = horizontal_evolution
-	features["weapon"] = memory.readbyte(0x00AA)
-	features["invulnerability_timer"] = memory.readbyte(0x00AE)
-	features["invencibility_timer"] = memory.readbyte(0x00B0)
-	features["water_status"] = memory.readbyte(0x00B2)
-	features["y_delta"] = memory.readbyte(0x00C6)
-	features["x_position"] = memory.readbyte(0x031A)
-	features["y_position"] = memory.readbyte(0x0334)
-	features["b0x"] = memory.readbyte(0x03B8)
-	features["b1x"] = memory.readbyte(0x03B9)
-	features["b2x"] = memory.readbyte(0x03BA)
-	features["b3x"] = memory.readbyte(0x03BB)
-	features["b4x"] = memory.readbyte(0x03BC)
-	features["b5x"] = memory.readbyte(0x03BD)
-	features["b6x"] = memory.readbyte(0x03BE)
-	features["b7x"] = memory.readbyte(0x03BF)
-	features["b8x"] = memory.readbyte(0x03C0)
-	features["b9x"] = memory.readbyte(0x03C1)
-	features["b0y"] = memory.readbyte(0x03C8)
-	features["b1y"] = memory.readbyte(0x03C9)
-	features["b2y"] = memory.readbyte(0x03CA)
-	features["b3y"] = memory.readbyte(0x03CB)
-	features["b4y"] = memory.readbyte(0x03CC)
-	features["b5y"] = memory.readbyte(0x03CD)
-	features["b6y"] = memory.readbyte(0x03CE)
-	features["b7y"] = memory.readbyte(0x03CF)
-	features["b8y"] = memory.readbyte(0x03D0)
-	features["b9y"] = memory.readbyte(0x03D1)
-
-	turret_delay = memory.readbyterange(0x0538, 0x000F)
-	for i=1,15 do
-		current_index = 'td' .. i
-		features[current_index] = string.byte(turret_delay, i)
-	end
-
-	enemy_shooting_delay = memory.readbyterange(0x0567, 0x000F)
-	for i=1,15 do
-		current_index = 'esd' .. i
-		features[current_index] = string.byte(enemy_shooting_delay, i)
-	end
-
-	enemy_work = memory.readbyterange(0x0568, 0x000F)
-	for i=1,15 do
-		current_index = 'ew' .. i
-		features[current_index] = string.byte(enemy_work, i)
-	end
-
-	enemy_hit_points = memory.readbyterange(0x0578, 0x000F)
-	for i=1,15 do
-		current_index = 'ehp' .. i
-		features[current_index] = string.byte(enemy_hit_points, i)
-	end
-
-	platforms = memory.readbyterange(0x0698, 0x005F)
-	for i=1,95 do
-		current_index = 'p' .. i
-		features[current_index] = string.byte(platforms, i)
+	feature_interval = memory.readbyterange(0x001C, 0x06DB)
+	for i=1,1755 do
+		current_index = 'f' .. i
+		features[current_index] = string.byte(feature_interval, i)
 	end
 
 	current_frame = current_frame + 1

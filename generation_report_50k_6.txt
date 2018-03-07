@@ -1,0 +1,10 @@
+Generation_0;1824
+Generation_1;1825
+Generation_2;1822
+Generation_3;1820
+Generation_4;1820
+Generation_5;1820
+Generation_6;1820
+Generation_7;1820
+Generation_8;1820
+Generation_9;1820

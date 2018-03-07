@@ -21,100 +21,72 @@ class genetic_model(object):
 	second_fully_connected_size = 0
 	activation = 0
 
-	def __init__(self, input_size_width, input_size_heigth, output_size, first_fully_connected_size, second_fully_connected_size, activation):
+	def __init__(self, input_size, output_size, first_fully_connected_size, second_fully_connected_size, activation):
 		super(genetic_model, self).__init__()
 
-		self.input_size_width = input_size_width
-		self.input_size_heigth = input_size_heigth
+		self.input_size = input_size
 		self.output_size = output_size
 		self.first_fully_connected_size = first_fully_connected_size
 		self.second_fully_connected_size = second_fully_connected_size
 		self.activation = activation
 
-		self.input_layer = input_data(shape=[None, input_size_width, input_size_heigth, 1], name='input')
+		self.input_layer = input_data(shape=[None, input_size, 1], name='input')
 		self.first_fully_connected = fully_connected(self.input_layer, first_fully_connected_size, activation=activation)
 		self.second_fully_connected = fully_connected(self.first_fully_connected, second_fully_connected_size, activation=activation)
-		self.output = fully_connected(self.second_fully_connected, output_size, activation='softplus')
-		self.network = regression(self.output, optimizer='adam', learning_rate=0.001, loss='categorical_crossentropy', name='targets')
+		self.output = fully_connected(self.second_fully_connected, output_size, activation='linear')
+		self.network = regression(self.output, optimizer='sgd', learning_rate=0.001, loss='categorical_crossentropy', name='targets')
 		self.model = tflearn.DNN(self.network, tensorboard_dir='log')
 		
-	def get_model(self):
-		return self.model
-
 	def initialize_random_weights_and_biases(self):
-		self.model.set_weights(self.first_fully_connected.W, np.random.rand(self.input_size_width*self.input_size_heigth, self.first_fully_connected_size))
+		self.model.set_weights(self.first_fully_connected.W, np.random.rand(self.input_size, self.first_fully_connected_size))
 		self.model.set_weights(self.first_fully_connected.b, np.random.rand(self.first_fully_connected_size))
 		self.model.set_weights(self.second_fully_connected.W, np.random.rand(self.first_fully_connected_size, self.second_fully_connected_size))
 		self.model.set_weights(self.second_fully_connected.b, np.random.rand(self.second_fully_connected_size))
 		self.model.set_weights(self.output.W, np.random.rand(self.second_fully_connected_size, self.output_size))
 		self.model.set_weights(self.output.b, np.random.rand(self.output_size))
 
-	def generate_mutations(self, mutation_rate):
-		genes_to_mutate = [
-			self.first_fully_connected.W,
-			self.first_fully_connected.b,
-			self.second_fully_connected.W,
-			self.second_fully_connected.b,
-			self.output.W,
-			self.output.b,
-		]
-
-		for weight_portion in genes_to_mutate:
-			gene = self.model.get_weights(weight_portion)
-
-			if len(gene.shape) == 1:
-				for i in range(0, gene.shape[0]):
-					will_mutate = random.uniform(0, 1)
-					if will_mutate < mutation_rate:
-						new_weight = random.uniform(0, 1)
-						gene[i] = new_weight
-				self.model.set_weights(weight_portion, gene)
-
-			if len(gene.shape) == 2:
-				for i in range(0, gene.shape[0]):
-					for j in range(0, gene.shape[1]):
-						will_mutate = random.uniform(0, 1)
-						if will_mutate < mutation_rate:
-							new_weight = random.uniform(0, 1)
-							gene[i][j] = new_weight
-				self.model.set_weights(weight_portion, gene)
-
-def get_empty_generation(individuals_per_generation, input_size_width, input_size_heigth, output_size, first_fully_connected_size, second_fully_connected_size, activation):
+def get_empty_generation(individuals_per_generation, input_size, output_size, first_fully_connected_size, second_fully_connected_size, activation):
 	current_generation_individuals = []
 	for individual_index in xrange(0, individuals_per_generation):
 		with tf.Graph().as_default():
-			individual = genetic_model(input_size_width, input_size_heigth, output_size, first_fully_connected_size, second_fully_connected_size, activation)
+			individual = genetic_model(input_size, output_size, first_fully_connected_size, second_fully_connected_size, activation)
 			individual.initialize_random_weights_and_biases()
 			current_generation_individuals.append(individual)
 	return current_generation_individuals
 
-def train_new_generation(individuals_per_generation, input_size_width, input_size_heigth, output_size, first_fully_connected_size, second_fully_connected_size, activation, X, Y, n_epoch, snapshot_step, snapshot_epoch):
+def train_new_generation(individuals_per_generation, input_size, output_size, first_fully_connected_size, second_fully_connected_size, activation, X, Y, n_epoch, snapshot_step, snapshot_epoch):
 	print 'Training new generation....'
 	current_generation_individuals = []
 	for individual_index in xrange(0, individuals_per_generation):
+		print '-------------------------------------'
+		print 'Now training inidividual ' + str(individual_index)
+		print '-------------------------------------'
 		with tf.Graph().as_default():
-			individual = genetic_model(input_size_width, input_size_heigth, output_size, first_fully_connected_size, second_fully_connected_size, activation)
+			individual = genetic_model(input_size, output_size, first_fully_connected_size, second_fully_connected_size, activation)
 			individual.initialize_random_weights_and_biases()
 			individual.model.fit({'input': X}, {'targets': Y}, n_epoch = n_epoch, snapshot_step = snapshot_step, snapshot_epoch = snapshot_epoch, show_metric = False)
 			current_generation_individuals.append(individual)
 
 	return current_generation_individuals
 
+
+
+
+
 print "Let's Start"
 
-pickle_to_load = 'random_examples_50k_bigger90.pickle'
+pickle_to_load = 'v2_random_examples_10k_0_02_high_score_value_activity.pickle'
 models_folder = 'models/'
-generation_report = 'generation_report.txt'
+generation_report = 'v2_generation_report.txt'
 
-input_size_width = 224
-input_size_heigth = 256
+input_size = 184
 output_size = 8
-first_fully_connected_size = 50
-second_fully_connected_size = 50
+first_fully_connected_size = 10
+second_fully_connected_size = 10
 activation = 'relu'
 mutation_rate = 0.2
-individuals_per_generation = 10
-n_epoch = 6
+individuals_per_generation = 2
+n_epoch = 20
 initial_data = 10000
 goal_score = 600
 
@@ -127,13 +99,15 @@ with open(pickle_to_load, 'rb') as file:
 np.random.shuffle(initial_training_data)
 initial_training_data = initial_training_data[:initial_data]
 
-game_object = NESGame(53475, 53474)
+# game_object = NESGame(53475, 53474)
+game_object = NESGame(53476, 53477)
 game_object.clean_screenshots()
 screenshots_folder = 'screenshots'
 
-X = [data[0].reshape(input_size_width, input_size_heigth, 1) for data in initial_training_data]
+X = [data[0].reshape(input_size, 1) for data in initial_training_data]
 Y = [data[1] for data in initial_training_data]
-current_generation_individuals = train_new_generation(individuals_per_generation, input_size_width, input_size_heigth, output_size, first_fully_connected_size, second_fully_connected_size, activation, X, Y, n_epoch, snapshot_step, snapshot_epoch)
+
+current_generation_individuals = train_new_generation(individuals_per_generation, input_size, output_size, first_fully_connected_size, second_fully_connected_size, activation, X, Y, n_epoch, snapshot_step, snapshot_epoch)
 
 while not game_object.is_ready_to_listen():
 	time.sleep(0.1)
@@ -151,16 +125,30 @@ while mean_score < goal_score:
 	score_history = []
 	game_object.soft_reset()
 	for individual in current_generation_individuals:
-		individual_performance = 0
+
+		# reset game and wait for it to finish reseting
 		game_object.soft_reset()
 		time.sleep(2)
+
 		actions_history = []
-		frame_history = []
+		game_memory = []
 		score = 0
+		individual_performance = 0
 		old_age_verification = 0
 		last_old_age_verification = 0
+		repetitiviness_rate = 0
+		repetitiviness_history = []
 		while True:
 			current_frame_number = game_object.get_last_frame_number()
+
+			# Check if agent is only repeating the same command
+			repetitiviness_rate = len(set(repetitiviness_history))
+			if len(repetitiviness_history) == 10000 and repetitiviness_rate == 1:
+				print 'Current argmax set: ' + str(set(repetitiviness_history))
+				print 'Dying of repetitiviness....'
+				break
+
+			# Check if agent should die of OLD AGE
 			if current_frame_number % 400 == 0:
 				if score == old_age_verification and last_old_age_verification != current_frame_number:
 					print 'Current frame: ' + str(game_object.get_last_frame_number())
@@ -171,28 +159,40 @@ while mean_score < goal_score:
 				else:
 					old_age_verification = score
 					last_old_age_verification = current_frame_number
-			current_frame = game_object.get_last_frame(black_and_white = True, delete_previous = False)
-			if current_frame is not None:
-				current_frame = current_frame.reshape(-1, input_size_width, input_size_heigth, 1)
-				prediction = individual.model.predict(current_frame)
+
+			current_feature_set = game_object.get_array_features()
+			if current_feature_set is not None:
+				# Get current status, analyse agent output and sent command
+				current_feature_set = current_feature_set.reshape(-1, input_size, 1)
+				prediction = individual.model.predict(current_feature_set)
 				sorted_prediction = prediction.argsort()[0][-2:]
 				joypad_list = [0, 0, 0, 0, 0, 0, 0, 0]
 				for index in sorted_prediction:
 					joypad_list[index] = 1
 				game_object.send_array_joypad(joypad_list)
 
+				# Save decision for posteriority
 				actions_history.append(joypad_list)
-				frame_history.append(current_frame)
+				game_memory.append(current_feature_set)
+				repetitiviness_history.append(np.argmax(joypad_list))
 
+				# Calculate score
 				p1_score = game_object.get_p1_score()
 				horizontal_evolution = game_object.get_horizontal_evolution()
-				score = p1_score + horizontal_evolution
+				score = ((100*p1_score) + horizontal_evolution)*repetitiviness_rate
+
+				# Check if player is dead
 				if not game_object.is_p1_alive():
 					break
+
+				# time.sleep(0.1)
 			else:
 				pass
 
 		score_history.append(score)
+		print 'Current agent game score: ' + str(p1_score) 
+		print 'Current agent horizontal evolution: ' + str(horizontal_evolution)
+		print 'Current agent repetitiviness rate: ' + str(repetitiviness_rate)
 		print 'Current agent performance: ' + str(score)
 		print '-------------------------------------'
 
@@ -200,28 +200,3 @@ while mean_score < goal_score:
 		game_object.send_array_joypad(joypad_list)
 		game_object.soft_reset()
 		time.sleep(3)
-
-	index = 0
-	best_score = np.argmax(score_history)
-	for score in score_history:
-		if index != best_score:
-			print 'Mutating now....'
-			current_generation_individuals[index].generate_mutations(mutation_rate)
-		else:
-			if score > 2000:
-				try:
-					name_to_save = 'model_generation_' + str(current_generation) + '_epochs_' + str(n_epoch) + '_initialdata_' + str(initial_data)+'.tflearn'
-					current_generation_individuals[index].model.save(models_folder + name_to_save)
-				except Exception as e:
-					print e
-		index = index + 1
-
-	if os.path.exists(generation_report):
-		append_write = 'a'
-	else:
-		append_write = 'w'
-	highscore = open(generation_report, append_write)
-	highscore.write("Generation_" + str(current_generation) + ';' + str(score_history[best_score]) + '\n')
-	highscore.close()
-
-	current_generation = current_generation + 1

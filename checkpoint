@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/fafaschiavo/projects/contrAI/model_generation_0_epochs_2_initialdata_500.tflearn"
+all_model_checkpoint_paths: "/home/fafaschiavo/projects/contrAI/model_generation_0_epochs_2_initialdata_500.tflearn"

@@ -12,6 +12,7 @@ import cv2
 import numpy as np
 sys.path.append(os.path.join(os.path.dirname(sys.argv[0]), "subfolder"))
 
+features = {}
 screenshots_folder = 'screenshots'
 keep_socket_alive = True
 data_received = False
@@ -34,8 +35,8 @@ joypad = dict(
 
 class socketThread(Thread):
 	IP = '127.0.0.1'
-	input_port = 53475
-	output_port = 53474
+	# input_port = 53475
+	# output_port = 53474
 
 	def __init__(self, input_port, output_port):
 		Thread.__init__(self)
@@ -66,14 +67,16 @@ class socketThread(Thread):
 		global p1_is_alive
 		global horizontal_evolution
 		global last_frame
+		global features
 
 		while keep_socket_alive:
-			data,addr = self.UDPSock.recvfrom(1024)
+			data,addr = self.UDPSock.recvfrom(32768)
 			data_received = json.loads(data.strip())
 			ready_to_listen = data_received['ready_to_listen']
 			p1_score = data_received['p1_score']
 			horizontal_evolution = data_received['horizontal_evolution']
 			last_frame = data_received['last_frame']
+			features = data_received['features']
 			if data_received['p1_is_alive'] == 1:
 				p1_is_alive = True
 			else:
@@ -148,6 +151,16 @@ class NESGame(object):
 		global horizontal_evolution
 		return horizontal_evolution
 
+	def get_features(self):
+		global features
+		return features
+
+	def get_array_features(self):
+		global features
+		features_list = [features[index] for index in features]
+		features_array = np.asarray(features_list)
+		return features_array
+
 	def get_last_frame_number(self):
 		global last_frame
 		return last_frame
@@ -156,7 +169,6 @@ class NESGame(object):
 		global last_frame
 		global screenshots_folder
 		filename = screenshots_folder + '/' + str(last_frame - 1)
-		print filename
 		if black_and_white:
 			frame = cv2.imread(filename, 0)
 		else:
@@ -195,9 +207,9 @@ class NESGame(object):
 # game_object = NESGame(53475, 53474)
 
 # while True:
-# 	time.sleep(3)
-# 	print game_object.is_p1_alive()
-	# game_object.soft_reset()
+# 	time.sleep(1)
+# 	print game_object.get_array_features()
+# 	print game_object.get_array_features().shape
 
 # keep_socket_alive = False
 # joypad['soft_reset'] = True

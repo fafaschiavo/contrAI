@@ -1,0 +1,15 @@
+Generation_0;[66, 12, 9];12.0
+Generation_1;[97, 81, 12];11.5
+Generation_2;[164, 107, 164];47.5
+Generation_3;[200, 200, 11];94.0
+Generation_4;[200, 200, 124];68.0
+Generation_5;[200, 200, 10];179.0
+Generation_6;[200, 200, 9];200.0
+Generation_7;[200, 200, 11];106.0
+Generation_8;[200, 200, 10];178.0
+Generation_9;[200, 200, 200];189.5
+Generation_10;[200, 200, 200];200.0
+Generation_11;[200, 200, 200];200.0
+Generation_12;[200, 200, 10];200.0
+Generation_13;[200, 200, 11];200.0
+Generation_14;[200, 200, 200];200.0
