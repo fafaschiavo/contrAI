@@ -155,7 +155,7 @@ n_epoch = 5
 individuals_per_generation = 20
 individuals_to_percevere = 4
 mutation_rate = 0.3
-crossovers_per_generation = 15
+crossovers_per_generation = 11
 
 snapshot_step = None
 snapshot_epoch = False
