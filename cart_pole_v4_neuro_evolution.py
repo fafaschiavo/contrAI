@@ -36,7 +36,7 @@ class genetic_model(object):
 		self.input_layer = input_data(shape=[None, input_size, 1], name='input')
 		self.first_fully_connected = fully_connected(self.input_layer, first_fully_connected_size, activation=activation)
 		self.second_fully_connected = fully_connected(self.first_fully_connected, second_fully_connected_size, activation=activation)
-		self.output = fully_connected(self.second_fully_connected, output_size, activation='linear')
+		self.output = fully_connected(self.second_fully_connected, output_size, activation='softmax')
 		self.network = regression(self.output, optimizer='sgd', learning_rate=0.001, loss='categorical_crossentropy', name='targets')
 		self.model = tflearn.DNN(self.network, tensorboard_dir='log')
 		
@@ -139,7 +139,7 @@ print '============'
 print "Let's Start"
 print '============'
 
-generation_report = 'cart_pole_v4_v7.txt'
+generation_report = 'cart_pole_v4_v9.txt'
 
 env = gym.make("CartPole-v0")
 env.reset()
@@ -229,8 +229,8 @@ while mean_score < goal_steps:
 				print 'Now mutating...'
 				heritage = top_individuals_indexes[randint(0, individuals_to_percevere-1)]
 				current_generation_individuals[index].clone_individual(current_generation_individuals[heritage])
-				# current_generation_individuals[index].generate_mutations(mutation_rate)
-				current_generation_individuals[index].generate_mutations(mutation_rate/(current_generation+1))
+				current_generation_individuals[index].generate_mutations(mutation_rate)
+				# current_generation_individuals[index].generate_mutations(mutation_rate/(mean_score/1.5))
 			else:
 				print 'Now crossing over...'
 				heritage = top_individuals_indexes[randint(0, individuals_to_percevere-1)]
