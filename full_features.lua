@@ -15,9 +15,9 @@ local json = require "cjson"
 
 local socket = require "socket"
 local INPUT_IP = '127.0.0.1'
-local INPUT_PORT = 53474
+local INPUT_PORT = 53476
 local OUTPUT_IP = '127.0.0.1'
-local OUTPUT_PORT = 53475
+local OUTPUT_PORT = 53477
 local outgoing = socket.udp()
 outgoing:setpeername(OUTPUT_IP, OUTPUT_PORT)
 outgoing:settimeout(0)
@@ -183,7 +183,7 @@ end
 -- emu.message('teste')
 -- emu.print('teste') -- Not working properly
 
--- fceux contra_rom.nes --loadlua helloworld.lua
+-- fceux contra_rom.nes --loadlua full_features.lua
 
 -- D – B
 -- F – A
