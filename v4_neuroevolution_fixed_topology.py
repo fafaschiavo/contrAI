@@ -142,7 +142,7 @@ print "Let's Start"
 
 pickle_to_load = 'v2_random_examples_10k_0_02_high_score_value_activity.pickle'
 models_folder = 'models/'
-generation_report = 'v4_generation_report_mutation_0_4.txt'
+generation_report = 'v4_generation_report_mutation_0_4_just_ps.txt'
 
 n_epoch = 20
 initial_data = 10000
