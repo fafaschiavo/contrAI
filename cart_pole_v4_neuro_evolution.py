@@ -196,6 +196,7 @@ while mean_score < goal_steps:
 		print 'Individual Performance: ' + str(individual_performance)
 		generation_scores.append(individual_performance)
 		generation_game_memory.append(individual_game_memory)
+		time.sleep(0.2)
 
 	best_performance = max(generation_scores)
 	best_individual = generation_scores.index(best_performance)
