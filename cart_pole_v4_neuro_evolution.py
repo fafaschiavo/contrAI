@@ -11,9 +11,6 @@ from tflearn.layers.estimator import regression
 from statistics import median, mean
 from collections import Counter
 import time
-from nes_server_v1 import NESGame
-import cv2
-import cPickle as pickle
 import os
 import heapq
 
@@ -180,7 +177,7 @@ while mean_score < goal_steps:
 		env.reset()
 
 		for t in range(500):
-			# env.render()
+			env.render()
 
 			if t == 0:
 				action = env.action_space.sample()
